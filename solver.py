@@ -10,7 +10,7 @@ class Solver:
         pass
 
     @abstractmethod
-    def classify(self, problem: Problem):
+    def sort(self, problem: Problem):
         pass
 
     def comprehensive_prefference_matrix(self, problem: Problem):

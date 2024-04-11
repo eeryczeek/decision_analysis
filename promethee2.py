@@ -18,6 +18,3 @@ class Promethee2(Solver):
 
         flow = positive_flow - negative_flow
         return flow.sort_values(ascending=False)
-
-    def classify(self, problem: Problem):
-        pass
