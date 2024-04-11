@@ -17,4 +17,6 @@ class Promethee2(Solver):
             )
 
         flow = positive_flow - negative_flow
+
+        assert sum(flow) < 0.001
         return flow.sort_values(ascending=False)

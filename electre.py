@@ -6,28 +6,44 @@ from srf import SRF
 
 
 class Electre(Solver):
+
     def rank(self, problem: Problem):
         pass
 
-    def sort(self, problem: Problem):
-        srf_weights = SRF().get_weights(8,
-                                        ['g1', '1 white card', 'g2', 'g3', '3 white cards', 'g4'])
+    def sort(self, problem: Problem, electre_srf_raw_weights: list):
+        srf_weights = SRF().get_weights(8, electre_srf_raw_weights)
 
-        boundary_classes = self.get_boundary_classes(problem)
+        boundary_classes: dict = self.get_boundary_classes(problem)
+        matrix = pd.DataFrame(dict(), index=problem.data.index,
+                              columns=boundary_classes.keys())
 
         for alternative in problem.data.index:
-            for boundary_class in boundary_classes:
+            for boundary_class_key, boundary_class_value in boundary_classes.items():
+                matrix[boundary_class_key][alternative] = {'c(a, b)': self.comprehensive_concordance(problem, problem.data.loc[alternative], boundary_class_value),
+                                                           #    'd(a, b)': self.discordance(problem, problem.data[alternative], boundary_class),
+                                                           'c(b, a)': self.comprehensive_concordance(problem, boundary_class_value, problem.data.loc[alternative]),
+                                                           #    'd(b, a)': self.discordance(problem, boundary_class, problem.data[alternative])
+                                                           }
 
-    def concordance(self, ):
-        pass
+        return matrix
 
-    def discordance(self, ):
-        pass
+    def comprehensive_concordance(self, problem: Problem, alternative, boundary):
+        return sum(problem.parameters[criterion]['weight'] * self.concordance(problem, alternative, boundary)[criterion] for criterion in problem.data.columns) / sum(problem.parameters[criterion]['weight'] for criterion in problem.data.columns)
 
-    def get_boundary_classes(self, problem: Problem, n_classes: int = 3):
+    def concordance(self, problem: Problem, alternative1, alternative2):
+        return {criterion: self.marginal_concordance(problem, alternative1, alternative2, criterion) for criterion in problem.data.columns}
+
+    def marginal_concordance(self, problem: Problem, alternative1, alternative2, criterion):
+        if alternative1[criterion] > alternative2[criterion] + problem.parameters[criterion]['p']:
+            return 1
+        return 0
+
+    def discordance(self, alternative1, alternative2):
+        return 0
+
+    def get_boundary_classes(self, problem: Problem, n_classes: int = 3) -> dict:
         boundaries = {f'b{i}': self.get_boundary_values(problem, i, n_classes)
                       for i in range(n_classes + 1)}
-        print(boundaries)
         return boundaries
 
     def get_boundary_values(self, problem: Problem, index: int, n_classes: int):

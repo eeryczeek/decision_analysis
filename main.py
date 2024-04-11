@@ -21,7 +21,15 @@ if __name__ == '__main__':
     promethee1 = Promethee1()
     promethee2 = Promethee2()
     electre = Electre()
+
+    ranking1 = promethee1.rank(problem)
+    ranking2 = promethee2.rank(problem)
+
     electre_srf_raw_weights = ['Unemployment Rate', '1 white card', 'Income Tax Rate',
                                'GINI', '3 white cards', 'Inflation', 'Gross Domestic Product', 'Total Reserves']
     assert all(key in electre_srf_raw_weights for key in parameters2.keys())
-    ranking3 = electre.sort(problem)
+
+    ranking3 = electre.sort(problem, electre_srf_raw_weights)
+    print(ranking1)
+    print(ranking2)
+    print(ranking3)
