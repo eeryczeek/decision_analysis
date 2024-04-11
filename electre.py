@@ -24,7 +24,6 @@ class Electre(Solver):
                                                            'c(b, a)': self.comprehensive_concordance(problem, boundary_class_value, problem.data.loc[alternative]),
                                                            #    'd(b, a)': self.discordance(problem, boundary_class, problem.data[alternative])
                                                            }
-
         return matrix
 
     def comprehensive_concordance(self, problem: Problem, alternative, boundary):
