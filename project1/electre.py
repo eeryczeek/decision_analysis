@@ -2,6 +2,7 @@ from functools import reduce
 
 import pandas as pd
 
+import boundary_profile as bp
 from problem import Problem
 from solver import Solver
 from srf import SRF
@@ -19,10 +20,8 @@ class Electre(Solver):
 
         boundary_classes: dict = self.get_boundary_classes(problem)
         matrix = pd.DataFrame(
-            dict(), index=problem.data.index, columns=boundary_classes.keys()
+            dict(), index=problem.data.index, columns=list(boundary_classes.keys())
         )
-
-        print(matrix)
 
         for alternative in problem.data.index:
             for boundary_class_key, boundary_class_value in boundary_classes.items():
@@ -31,13 +30,22 @@ class Electre(Solver):
                 )
         return matrix
 
-    def comprehensive_concordance(self, problem: Problem, alternative, boundary):
-        print("comprehensive_concordance")
-        print(f"params: {problem.parameters}")
-        print(f"a: {alternative},\nb_n: {boundary}")
+    def comprehensive_concordance(
+        self,
+        problem: Problem,
+        alternative,
+        boundary_profile_values,
+        boundary_profile_criterions: dict[str, bp.Criterion],
+    ) -> float:
         return sum(
             problem.parameters[criterion]["weight"]
-            * self.marginal_concordance(problem, alternative, boundary, criterion)
+            * self.marginal_concordance(
+                problem,
+                alternative,
+                boundary_profile_values,
+                boundary_profile_criterions,
+                criterion,
+            )
             for criterion in problem.data.columns
         ) / sum(
             problem.parameters[criterion]["weight"]
@@ -45,10 +53,15 @@ class Electre(Solver):
         )
 
     def marginal_concordance(
-        self, problem: Problem, alternative1, alternative2, criterion
-    ):
-        p = problem.parameters[criterion]["p"]
-        q = problem.parameters[criterion]["q"]
+        self,
+        problem: Problem,
+        alternative1,
+        alternative2,
+        parameters: dict[str, bp.Criterion],
+        criterion: str,
+    ) -> float:
+        p = parameters[criterion].p
+        q = parameters[criterion].q
 
         if problem.parameters[criterion]["type"] == "cost":
             alternative1, alternative2 = alternative2, alternative1
@@ -59,16 +72,21 @@ class Electre(Solver):
         return (p - (alternative2[criterion] - alternative1[criterion])) / (p - q)
 
     def marginal_discordance(
-        self, problem: Problem, alternative1, alternative2, criterion
-    ):
+        self,
+        problem: Problem,
+        alternative1,
+        alternative2,
+        parameters: dict[str, bp.Criterion],
+        criterion: str,
+    ) -> float:
         if problem.parameters[criterion]["type"] == "cost":
             alternative1, alternative2 = alternative2, alternative1
 
         if "v" not in problem.parameters[criterion].keys():
             return 0
         else:
-            v = problem.parameters[criterion]["v"]
-            p = problem.parameters[criterion]["p"]
+            v = parameters[criterion].v
+            p = parameters[criterion].p
 
         if alternative1[criterion] <= alternative2[criterion] - v:
             return 1
@@ -76,34 +94,39 @@ class Electre(Solver):
             return 0
         return (alternative2[criterion] - alternative1[criterion] - p) / (v - p)
 
-    def outranking_credibility(self, problem: Problem, alternative1, alternative2):
+    def outranking_credibility(
+        self,
+        problem: Problem,
+        alternative1,
+        alternative2,
+        parameters: dict[str, bp.Criterion],
+    ) -> float:
         marginal_discordance = lambda criterion: self.marginal_discordance(
-            problem, alternative1, alternative2, criterion
+            problem, alternative1, alternative2, parameters, criterion
         )
         comprehensive_concordance = self.comprehensive_concordance(
-            problem, alternative1, alternative2
+            problem, alternative1, alternative2, parameters
         )
-
-        print("outranking_credibility")
-        print(f"comprensive_concordance: {comprehensive_concordance}")
 
         return reduce(
             lambda x, y: x * y,
             [
-                (1 - marginal_discordance(criterion))
-                / (1 - comprehensive_concordance)  # TODO: division by zero
+                (1 - marginal_discordance(criterion)) / (1 - comprehensive_concordance)
                 for criterion in problem.data.columns
                 if comprehensive_concordance < marginal_discordance(criterion)
             ],
             comprehensive_concordance,
         )
 
-    def get_relation(self, problem: Problem, alternative, boundary_profile):
+    def get_relation(
+        self, problem: Problem, alternative, boundary_profile: bp.BoundaryProfile
+    ) -> str:
+        boundary_profile_values = boundary_profile.to_alternative()
         outranking_credibility_alternative = self.outranking_credibility(
-            problem, alternative, boundary_profile
+            problem, alternative, boundary_profile_values, boundary_profile.criterions
         )
         outranking_credibility_boundary = self.outranking_credibility(
-            problem, boundary_profile, alternative
+            problem, boundary_profile_values, alternative, boundary_profile.criterions
         )
 
         if outranking_credibility_alternative >= self.credibility_threshold:
@@ -117,24 +140,59 @@ class Electre(Solver):
             else:
                 return "?"
 
-    def get_boundary_classes(self, problem: Problem, n_classes: int = 3) -> dict:
-        boundaries = {
-            f"b{i}": self.get_boundary_values(problem, i, n_classes)
-            for i in range(n_classes + 1)
-        }
-        return boundaries
+    def get_boundary_classes(
+        self,
+        problem: Problem,
+        n_classes: int = 3,
+        boundary_parameters: dict = dict(),
+    ) -> dict[str, bp.BoundaryProfile]:
+        if not boundary_parameters:
+            boundary_profiles = {
+                f"b{i}": self.get_boundary_values(problem, i, n_classes)
+                for i in range(n_classes + 1)
+            }
+        else:
+            boundary_profiles = {
+                f"b{i}": self.get_boundary_values(
+                    problem, i, n_classes, boundary_parameters[f"b{i}"]
+                )
+                for i in range(n_classes + 1)
+            }
+        return boundary_profiles
 
-    def get_boundary_values(self, problem: Problem, index: int, n_classes: int):
-        return {
-            data_column: (
-                problem.data[data_column].max() - problem.data[data_column].min()
+    def get_boundary_values(
+        self,
+        problem: Problem,
+        index: int,
+        n_classes: int,
+        boundary_parameters: dict = dict(),
+    ):
+        criterions = {
+            criterion_name: bp.Criterion(
+                v=boundary_parameters.get(
+                    "v", problem.parameters[criterion_name].get("v", None)
+                ),
+                p=boundary_parameters.get(
+                    "p", problem.parameters[criterion_name].get("p", 0)
+                ),
+                q=boundary_parameters.get(
+                    "q", problem.parameters[criterion_name].get("q", 0)
+                ),
+                value=(
+                    (
+                        problem.data[criterion_name].max()
+                        - problem.data[criterion_name].min()
+                    )
+                    * (
+                        index
+                        if problem.parameters[criterion_name]["type"] == "gain"
+                        else n_classes - index
+                    )
+                    / n_classes
+                    + problem.data[criterion_name].min()
+                ),
             )
-            * (
-                index
-                if problem.parameters[data_column]["type"] == "gain"
-                else n_classes - index
-            )
-            / n_classes
-            + problem.data[data_column].min()
-            for data_column in problem.data.columns
+            for criterion_name in problem.data.columns
         }
+
+        return bp.BoundaryProfile(criterions)

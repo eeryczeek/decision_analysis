@@ -23,13 +23,13 @@ if __name__ == "__main__":
         "g3": {"type": "cost", "q": 100, "p": 300, "weight": 5},
         "g4": {"type": "gain", "q": 1, "p": 1, "weight": 3},
     }
-    problem = Problem("data/prunned_dataset.csv", parameters)
+    problem = Problem("../data/prunned_dataset.csv", parameters)
     promethee1 = Promethee1()
     promethee2 = Promethee2()
     electre = Electre()
 
-    ranking1 = promethee1.rank(problem, plot=True)
-    ranking2 = promethee2.rank(problem, plot=True)
+    ranking1 = promethee1.rank(problem, plot=False)
+    ranking2 = promethee2.rank(problem, plot=False)
 
     electre_srf_raw_weights = [
         "Unemployment Rate",
