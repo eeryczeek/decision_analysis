@@ -91,4 +91,4 @@ class Promethee1(Solver):
         pos = nx.spring_layout(G, k=0.7, pos=pos, iterations=3)
 
         nx.draw_networkx(G, with_labels=True, pos=pos, **options)
-        plt.savefig('project1/results/ranking_graph.png')
+        plt.savefig('project1/results/ranking_graph_promethee1.png')
