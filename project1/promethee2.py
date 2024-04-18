@@ -20,6 +20,7 @@ class Promethee2(Solver):
             )
 
         flow = positive_flow - negative_flow
+        flow = flow.sort_values(ascending=False)
 
         assert sum(flow) < 1e-6
         if plot:
@@ -27,7 +28,7 @@ class Promethee2(Solver):
         return flow.sort_values(ascending=False)
 
     def plot_graph(self, ranking_nodes):
-        plt.figure(0, figsize=(12, 8))
+        plt.figure(2, figsize=(12, 8))
         options = {
             "font_size": 12,
             "node_size": 400,
@@ -37,9 +38,8 @@ class Promethee2(Solver):
             "width": 2,
         }
         G = nx.DiGraph()
-        for alternative in ranking_nodes.values():
-            for better_alternative in alternative.better_than:
-                G.add_edge(alternative.alternative, better_alternative)
+        for alternative1, alternative2 in zip(ranking_nodes.index[:-1], ranking_nodes.index[1:]):
+            G.add_edge(alternative1, alternative2)
 
         pos = nx.spectral_layout(G)
         for node, position in pos.items():
@@ -47,4 +47,5 @@ class Promethee2(Solver):
         pos = nx.spring_layout(G, k=0.7, pos=pos, iterations=3)
 
         nx.draw_networkx(G, with_labels=True, pos=pos, **options)
+        plt.title("Promethee 2 ranking")
         plt.savefig('project1/results/ranking_graph_promethee2.png')

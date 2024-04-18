@@ -30,3 +30,9 @@ parameters = {
     "GINI": {"type": "cost", "q": 1, "p": 1, "weight": 1},
 }
 ```
+
+## Promethee1 and Promethee2 results:
+
+![promethee1](./results/ranking_graph_promethee1.png)
+
+![promethee2](./results/ranking_graph_promethee2.png)

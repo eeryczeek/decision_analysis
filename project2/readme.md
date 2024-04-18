@@ -264,3 +264,17 @@ Unemployment_Rate_1.18 <= 1 Continuous
 solution found
 
 Objective value: 2.0
+
+# Plots:
+
+![GINI](./results/GINI.png)
+
+![Gross Domestic Product](./results/Gross_Domestic_Product.png)
+
+![Income Tax Rate](./results/Income_Tax_Rate.png)
+
+![Inflation](./results/Inflation.png)
+
+![Total Reserves](./results/Total_Reserves.png)
+
+![Unemployment Rate](./results/Unemployment_Rate.png)

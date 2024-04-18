@@ -20,7 +20,7 @@ def plot_functions(break_points: list[LpVariable]):
         plt.title(f'Utility function for {data_column}')
         plt.legend()
         plt.ylim(-0.05, max_value + 0.05)
-        plt.savefig(f'project2/results/{data_column}.png')
+        plt.savefig(f'project2/results/{data_column.replace(' ', '_')}.png')
 
 
 if __name__ == '__main__':
