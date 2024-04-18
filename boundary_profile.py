@@ -1,14 +1,14 @@
+class Criterion:
+    def __init__(self, v: float, p: float, q: float, value: float) -> None:
+        self.v = v
+        self.p = p
+        self.q = q
+        self.value = value
+
+
 class BoundaryProfile:
-    def __init__(self, criterions: dict[str, dict[str, int]]) -> None:
-        """
-        example of criterion:
-        {
-            "criterion1": {
-                "v": 0.5,
-                "p": 0.2,
-                "q": 0.1,
-                "value": 7,
-            }
-        }
-        """
+    def __init__(self, criterions: dict[str, Criterion]) -> None:
         self.criterions = criterions
+
+    def to_alternative(self) -> dict[str, float]:
+        return {name: criterion.value for name, criterion in self.criterions.items()}
