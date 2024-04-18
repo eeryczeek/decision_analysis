@@ -28,7 +28,9 @@ class Electre(Solver):
                 matrix[boundary_class_key][alternative] = self.get_relation(
                     problem, problem.data.loc[alternative], boundary_class_value
                 )
-        return matrix
+
+        pessimistic_classification = self.pessimistic_classification(problem, matrix)
+        return pessimistic_classification
 
     def comprehensive_concordance(
         self,
@@ -196,3 +198,16 @@ class Electre(Solver):
         }
 
         return bp.BoundaryProfile(criterions)
+
+    def pessimistic_classification(self, problem: Problem, relations: pd.DataFrame):
+        """Returns the class in which each alternative should be classified according to the pessimistic classification method"""
+        number_of_classes = len(relations.columns)
+        class_assignments = {
+            country: f"C{number_of_classes - sum(1 for value in performances if value in ['<', '?'])}"
+            for country, performances in relations.iterrows()
+        }
+        return pd.DataFrame(
+            class_assignments.values(),
+            index=list(class_assignments.keys()),
+            columns=["Class"],
+        )
