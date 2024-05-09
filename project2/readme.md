@@ -1,8 +1,56 @@
+`Eryk Walter 151931`, `Eryk Ptaszyński 151950`
+
 # 2.1:
 
-    done:)
+    Our model successfully finds subsets of conflict-free constraints and solves the uta problem for them
 
 # 2.2:
+
+Ranking for the largest set of consistent preference information:
+
+| Countries    | Utility  | Rank |
+| ------------ | -------- | ---- |
+| India        | 0.509122 | 1.0  |
+| Ukraine      | 0.33174  | 2.0  |
+| Belarus      | 0.326464 | 3.0  |
+| Moldova      | 0.313598 | 4.0  |
+| Brazil       | 0.296359 | 5.0  |
+| Hungary      | 0.286929 | 6.0  |
+| Tunisia      | 0.265539 | 7.0  |
+| Mongolia     | 0.264306 | 8.0  |
+| Armenia      | 0.258263 | 9.0  |
+| Ethiopia     | 0.250008 | 10.0 |
+| Indonesia    | 0.250005 | 11.0 |
+| Romania      | 0.250003 | 12.0 |
+| Argentina    | 0.250002 | 13.0 |
+| Turkey       | 0.250002 | 14.0 |
+| Georgia      | 0.250001 | 15.0 |
+| Angola       | 0.25     | 16.0 |
+| Greece       | 0.25     | 17.0 |
+| Madagascar   | 0.249999 | 18.0 |
+| Mozambique   | 0.249999 | 19.0 |
+| Guatemala    | 0.249998 | 20.0 |
+| Namibia      | 0.249997 | 21.0 |
+| Colombia     | 0.249997 | 22.0 |
+| Mexico       | 0.249997 | 23.0 |
+| Serbia       | 0.249996 | 24.0 |
+| Honduras     | 0.249996 | 25.0 |
+| Paraguay     | 0.249995 | 26.0 |
+| Philippines  | 0.249995 | 27.0 |
+| Peru         | 0.249995 | 28.0 |
+| Chile        | 0.249995 | 29.0 |
+| Panama       | 0.249992 | 30.0 |
+| Slovenia     | 0.249991 | 31.0 |
+| Costa Rica   | 0.240379 | 32.0 |
+| Spain        | 0.236559 | 33.0 |
+| El Salvador  | 0.236384 | 34.0 |
+| Tanzania     | 0.210263 | 35.0 |
+| Uganda       | 0.202983 | 36.0 |
+| South Africa | 0.202506 | 37.0 |
+| Portugal     | 0.166676 | 38.0 |
+| Thailand     | 0.083341 | 39.0 |
+
+We didn't expect India to rank so high
 
 ```
 MINIMIZE

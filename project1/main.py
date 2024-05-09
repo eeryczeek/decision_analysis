@@ -11,11 +11,11 @@ if __name__ == "__main__":
     }
     parameters = {
         "Gross Domestic Product": {"type": "gain", "q": 100, "p": 1000, "weight": 3},
-        "Unemployment Rate": {"type": "cost", "q": 0.1, "p": 0.2, "weight": 9},
-        "Income Tax Rate": {"type": "cost", "q": 1, "p": 1, "weight": 1},
-        "Inflation": {"type": "cost", "q": 0, "p": 0.1, "weight": 5},
-        "Total Reserves": {"type": "gain", "q": 1, "p": 1000, "weight": 7},
-        "GINI": {"type": "cost", "q": 1, "p": 1, "weight": 3},
+        "Unemployment Rate": {"type": "cost", "q": 0.01, "p": 0.2, "weight": 9},
+        "Income Tax Rate": {"type": "cost", "q": 1, "p": 10, "weight": 1},
+        "Inflation": {"type": "cost", "q": 0.01, "p": 0.4, "weight": 5},
+        "Total Reserves": {"type": "gain", "q": 1000, "p": 1000000, "weight": 7},
+        "GINI": {"type": "cost", "q": 1, "p": 10, "weight": 3},
     }
     parameters3 = {
         "g1": {"type": "gain", "q": 1, "p": 1, "weight": 3},
@@ -23,7 +23,7 @@ if __name__ == "__main__":
         "g3": {"type": "cost", "q": 100, "p": 300, "weight": 5},
         "g4": {"type": "gain", "q": 1, "p": 1, "weight": 3},
     }
-    problem = Problem("../data/prunned_dataset.csv", parameters)
+    problem = Problem("./data/prunned_dataset.csv", parameters)
     promethee1 = Promethee1()
     promethee2 = Promethee2()
     electre = Electre()
