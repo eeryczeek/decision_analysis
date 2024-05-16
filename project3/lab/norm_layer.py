@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from threshold_layer import ThresholdLayer
+from .threshold_layer import ThresholdLayer
 
 
 class NormLayer(nn.Module):
@@ -50,4 +50,5 @@ class NormLayer(nn.Module):
         one = self.method_instance(zero_input + 1)
 
         self.out = (self.out - zero) / (one - zero)
+        self.out = self.out.unsqueeze(1)
         return self.thresholdLayer(self.out)
