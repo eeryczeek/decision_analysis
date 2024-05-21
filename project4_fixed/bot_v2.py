@@ -7,34 +7,37 @@ class BotV2(Player):
         super().__init__(name)
         self.pile = []
         self.cards_in_game = set()
+        self.first_draw = True
 
     def putCard(self, declared_card):
+        lowest = min(self.cards, key=lambda x: x[0])
+        highest = max(self.cards, key=lambda x: x[0])
+
+        # if len(self.pile) >= 3 and self.first_draw:
+        #     self.first_draw = False
+        #     return "draw"
+
         self.cards_in_game.update(self.cards)
         sorted_cards = sorted(self.cards)
         if declared_card is None:
-            self.pile.append((sorted_cards[0], sorted_cards[0]))
-            return sorted_cards[0], sorted_cards[0]
+            self.pile.append((lowest, lowest))
+            return lowest, lowest
+
+        hand_valid_cards = list(
+            filter(lambda card: card[0] >= declared_card[0], sorted_cards))
 
         self.pile.append(('?', declared_card))
         if len(self.cards) == 1 and self.cards[0][0] < declared_card[0]:
             return "draw"
 
-        valid_cards = list(
-            filter(lambda card: card[0] >= declared_card[0], sorted_cards))
-        all_games_valid_cards = list(
-            filter(lambda card: card[0] >= declared_card[0], sorted(self.cards_in_game)))
+        if len(hand_valid_cards) > 0:
+            self.pile.append((hand_valid_cards[-1], hand_valid_cards[-1]))
+            return (hand_valid_cards[-1], hand_valid_cards[-1])
 
-        if len(valid_cards) > 0:
-            self.pile.append((valid_cards[0], valid_cards[0]))
-            return valid_cards[0], valid_cards[0]
-        if len(all_games_valid_cards) > 0:
-            self.pile.append(
-                (all_games_valid_cards[0], all_games_valid_cards[0]))
-            return sorted_cards[0], all_games_valid_cards[0]
+        if random.random() < 0.5:
+            return highest, (random.randint(declared_card[0], 14), random.randint(0, 4))
 
-        random_card = (random.randint(
-            declared_card[0], 14), random.randint(0, 4))
-        return sorted_cards[0], random_card
+        return "draw"
 
     def checkCard(self, opponent_declaration):
         if len(self.cards_in_game) >= 12:
@@ -52,10 +55,4 @@ class BotV2(Player):
 
     def startGame(self, cards):
         super().startGame(cards)
-        self.opponent_cards = [('?', '?') for card in cards]
-
-    def __str__(self):
-        return "eryk"
-
-    def __repr__(self):
-        return "eryk"
+        self.opponent_cards = [('?', '?') for _ in cards]
