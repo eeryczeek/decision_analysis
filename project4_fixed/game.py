@@ -63,8 +63,10 @@ class Game():
         if log:
             logging.info(f"turn: {sum(self.stats['moves'])}")
             logging.info(f"player {self.players[self.player_move].name} moves")
-            logging.info(f"player1 cards: {self.players[0].cards}")
-            logging.info(f"player2 cards: {self.players[1].cards}")
+            logging.info(
+                f"player1 cards ({len(self.players[0].cards)}): {self.players[0].cards}")
+            logging.info(
+                f"player2 cards ({len(self.players[1].cards)}): {self.players[1].cards}")
             logging.info(f"pile: {self.pile}")
             logging.info(f"declared card: {self.declared_card}")
 
@@ -100,8 +102,8 @@ class Game():
                 self.stats["cheats"][self.player_move] += 1
 
             if log:
-                print("[+] " + activePlayer.name + " puts " + str(self.true_card) +
-                      " and declares " + str(self.declared_card))
+                logging.info("[+] " + activePlayer.name + " puts " + str(self.true_card) +
+                             " and declares " + str(self.declared_card))
 
             if not self.debugMove():
                 return False, self.player_move
@@ -120,7 +122,8 @@ class Game():
                 self.stats["checks"][1 - self.player_move] += 1
 
                 if log:
-                    print("[!] " + opponent.name + ": " + "I want to check")
+                    logging.info("[!] " + opponent.name +
+                                 ": " + "I want to check")
                 toTake = self.pile[max([-3, -len(self.pile)]):]
                 for c in toTake:
                     self.pile.remove(c)

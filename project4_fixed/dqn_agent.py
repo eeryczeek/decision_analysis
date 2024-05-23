@@ -7,6 +7,22 @@ from collections import deque
 import random
 
 
+class PlayerModel:
+    def __init__(self, cards: set):
+        self.pile = []
+        self.cards = np.zeros((6, 4))
+        self.cards_in_game = np.zeros((6, 4))
+        for card in cards:
+            self.cards[card[0] - 9][card[1]] = 1
+            self.cards_in_game[card[0] - 9][card[1]] = 1
+
+    def __str__(self):
+        return f"pile: {self.pile}, cards_in_game: {self.cards_in_game}"
+
+    def __repr__(self):
+        return self.__str__()
+
+
 class DQNAgent:
     def __init__(self, state_size, action_size):
         self.state_size = state_size
